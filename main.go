@@ -2,51 +2,70 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
+	"github.com/atotto/clipboard"
 )
 
-// Entry point of the application
-func main() {
-	// Create a new Fyne application
-	myApp := app.New()
+type clickableLabel struct {
+	widget.Label
+	lastClick time.Time
+	onClick   func()
+}
 
-	// Create a new window and set its title
-	myWindow := myApp.NewWindow("LazyCopy")
+func newClickableLabel(text string, onClick func()) *clickableLabel {
+	label := &clickableLabel{onClick: onClick}
+	label.Text = text
+	return label
+}
 
-	// Create a new multiline entry widget
-	textEntry := widget.NewMultiLineEntry()
-	textEntry.SetPlaceHolder("Select some text here...")
-
-	// Create a label to show debug messages
-	debugLabel := widget.NewLabel("Debug messages will appear here")
-
-	// Add a listener to detect selection changes
-	textEntry.OnCursorChanged = func() {
-		selectedText := textEntry.SelectedText()
-		if selectedText != "" {
-			debugLabel.SetText("Selected: " + selectedText)
-		} else {
-			debugLabel.SetText("No text selected")
+func (c *clickableLabel) MouseDown(me *desktop.MouseEvent) {
+	now := time.Now()
+	if now.Sub(c.lastClick) < 500*time.Millisecond {
+		if c.onClick != nil {
+			c.onClick()
 		}
 	}
+	c.lastClick = now
+}
 
-	// Make the debug label more visible
-	debugLabel.Alignment = fyne.TextAlignCenter
-	debugLabel.TextStyle = fyne.TextStyle{Bold: true}
+func (c *clickableLabel) MouseUp(*desktop.MouseEvent)    {}
+func (c *clickableLabel) MouseIn(*desktop.MouseEvent)    {}
+func (c *clickableLabel) MouseOut()                      {}
+func (c *clickableLabel) MouseMoved(*desktop.MouseEvent) {}
 
-	// Set the content with some padding
-	content := container.NewVBox(
-		textEntry,
-		widget.NewSeparator(), // Add a visual separator
-		debugLabel,
-	)
+func main() {
+	myApp := app.New()
 
-	// Set the content of the window to include both widgets
-	myWindow.SetContent(content)
+	copyWindow := myApp.NewWindow("Copy")
+	copyWindow.Resize(fyne.NewSize(100, 40))
+	copyWindow.SetFixedSize(true)
+	copyWindow.Hide()
 
-	// Show the window and start the application
-	myWindow.ShowAndRun()
+	copyBtn := widget.NewButton("Copy", func() {
+		if text, err := clipboard.ReadAll(); err == nil {
+			fmt.Printf("Copied: %q\n", text)
+		}
+		copyWindow.Hide()
+	})
+	copyWindow.SetContent(container.NewPadded(copyBtn))
+
+	mainWindow := myApp.NewWindow("LazyCopy")
+	label := newClickableLabel("LazyCopy is running...\nDouble-click anywhere to show copy button", func() {
+		copyWindow.CenterOnScreen()
+		copyWindow.Show()
+		copyWindow.RequestFocus()
+	})
+
+	mainWindow.SetContent(label)
+	mainWindow.Resize(fyne.NewSize(200, 50))
+	mainWindow.Show()
+
+	myApp.Run()
 }
