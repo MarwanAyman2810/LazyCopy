@@ -6,7 +6,6 @@ toolchain go1.23.4
 
 require fyne.io/fyne/v2 v2.5.3
 
-
 require (
 	github.com/dblohm7/wingoes v0.0.0-20240820181039-f2b84150679e // indirect
 	github.com/ebitengine/purego v0.8.0 // indirect
@@ -33,6 +32,7 @@ require (
 )
 
 require (
+	fyne.io/fyne v1.4.3
 	fyne.io/systray v1.11.0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/atotto/clipboard v0.1.4

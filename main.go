@@ -27,11 +27,14 @@ func main() {
 
 	// Create the copy window
 	copyWindow := myApp.NewWindow("Copy")
-	copyWindow.Resize(fyne.NewSize(100, 40))
+	copyWindow.Resize(fyne.NewSize(300, 100))
 	copyWindow.SetFixedSize(true)
 	copyWindow.Hide()
 
 	var selectedText string
+
+	// Add label to display selected text
+	textLabel := widget.NewLabel("")
 	copyBtn := widget.NewButton("Copy", func() {
 		if selectedText != "" {
 			if err := clipboard.WriteAll(selectedText); err != nil {
@@ -40,7 +43,13 @@ func main() {
 		}
 		copyWindow.Hide()
 	})
-	copyWindow.SetContent(container.NewPadded(copyBtn))
+
+	// Use vertical box to stack label and button
+	content := container.NewVBox(
+		textLabel,
+		copyBtn,
+	)
+	copyWindow.SetContent(container.NewPadded(content))
 
 	// Monitor text selection
 	go func() {
@@ -48,6 +57,7 @@ func main() {
 			newSelection := getSelectedText()
 			if newSelection != "" && newSelection != selectedText {
 				selectedText = newSelection
+				textLabel.SetText(selectedText)
 				copyWindow.Show()
 				copyWindow.CenterOnScreen()
 				copyWindow.RequestFocus()
