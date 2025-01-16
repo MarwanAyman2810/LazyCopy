@@ -44,11 +44,9 @@ func main() {
 		now := time.Now()
 		if now.Sub(lastClick) < 500*time.Millisecond {
 			// Show the copy window on double-click
-			myApp.Driver().RunOnMainThread(func() { // Changed from myApp.QueueUpdate to myApp.Driver().RunOnMainThread
-				copyWindow.CenterOnScreen()
-				copyWindow.Show()
-				copyWindow.RequestFocus()
-			})
+			copyWindow.CenterOnScreen()
+			copyWindow.Show()
+			copyWindow.RequestFocus()
 		}
 		lastClick = now
 	})
