@@ -1,5 +1,5 @@
 # Hi
-Learning go while implementing small projects for my own use cases
+Learning go while implementing a small project for my own use case
 
 ![3](https://github.com/user-attachments/assets/76317b41-e809-4a3d-9ed6-f549b520263b)
 | paste&go  | dynamic display |
