@@ -11,6 +11,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/atotto/clipboard"
+	"github.com/go-vgo/robotgo"
 )
 
 func getSelectedText() string {
@@ -47,20 +48,9 @@ func main() {
 	// Add paste button
 	pasteBtn := widget.NewButton("Paste", func() {
 		copyWindow.Hide()
+		// Give a small delay for window focus to change
 		time.Sleep(100 * time.Millisecond)
-
-		cmd := exec.Command("xsel", "-b", "-o")
-		output, err := cmd.Output()
-		if err != nil {
-			fmt.Printf("Error pasting: %v\n", err)
-			return
-		}
-
-		// Use xdotool type to type the text
-		typeCmd := exec.Command("xdotool", "type", string(output))
-		if err := typeCmd.Run(); err != nil {
-			fmt.Printf("Error typing: %v\n", err)
-		}
+		robotgo.KeyTap("v", "ctrl")
 	})
 
 	// Use vertical box to stack label and buttons
