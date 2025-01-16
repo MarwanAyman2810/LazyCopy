@@ -66,14 +66,21 @@ func main() {
 
 	// Monitor text selection
 	go func() {
+		isWindowVisible := false
 		for {
 			newSelection := getSelectedText()
 			if newSelection != "" && newSelection != selectedText {
 				selectedText = newSelection
 				textLabel.SetText(selectedText)
-				copyWindow.Show()
-				copyWindow.CenterOnScreen()
-				copyWindow.RequestFocus()
+				if !isWindowVisible {
+					copyWindow.Show()
+					copyWindow.CenterOnScreen()
+					copyWindow.RequestFocus()
+					isWindowVisible = true
+				}
+			} else if newSelection == "" && isWindowVisible {
+				copyWindow.Hide()
+				isWindowVisible = false
 			}
 			time.Sleep(100 * time.Millisecond)
 		}
