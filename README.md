@@ -2,6 +2,7 @@ Hello
 this is a small clipboard tool that automatically pops up whenever the user selects any text then hides after the text is pasted
 this program is specifically designed for fedora with X11
 originally coded because i am too lazy to right click or grab the keyboard while chiling on yt in bed
+
 ![3](https://github.com/user-attachments/assets/76317b41-e809-4a3d-9ed6-f549b520263b)
 | paste&go  | dynamic display |
 | ------------- | ------------- |
@@ -9,3 +10,7 @@ originally coded because i am too lazy to right click or grab the keyboard while
 |   |  |
 
 
+to run the program
+sudo dnf update
+sudo dnf install -y go 
+go run main.go
