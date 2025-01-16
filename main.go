@@ -25,6 +25,7 @@ func getSelectedText() string {
 }
 
 func main() {
+
 	myApp := app.New()
 
 	// Create the copy window
