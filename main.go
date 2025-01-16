@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -26,8 +27,8 @@ func main() {
 	myApp := app.New()
 
 	// Create the copy window
-	copyWindow := myApp.NewWindow("Copy")
-	copyWindow.Resize(fyne.NewSize(300, 100))
+	copyWindow := myApp.NewWindow("Copy/Paste")
+	copyWindow.Resize(fyne.NewSize(300, 150))
 	copyWindow.SetFixedSize(true)
 	copyWindow.Hide()
 
@@ -41,13 +42,32 @@ func main() {
 				fmt.Printf("Error writing to clipboard: %v\n", err)
 			}
 		}
-		copyWindow.Hide()
 	})
 
-	// Use vertical box to stack label and button
+	// Add paste button
+	pasteBtn := widget.NewButton("Paste", func() {
+		copyWindow.Hide()
+		time.Sleep(100 * time.Millisecond)
+
+		cmd := exec.Command("xsel", "-b", "-o")
+		output, err := cmd.Output()
+		if err != nil {
+			fmt.Printf("Error pasting: %v\n", err)
+			return
+		}
+
+		// Use xdotool type to type the text
+		typeCmd := exec.Command("xdotool", "type", string(output))
+		if err := typeCmd.Run(); err != nil {
+			fmt.Printf("Error typing: %v\n", err)
+		}
+	})
+
+	// Use vertical box to stack label and buttons
 	content := container.NewVBox(
 		textLabel,
 		copyBtn,
+		pasteBtn,
 	)
 	copyWindow.SetContent(container.NewPadded(content))
 
