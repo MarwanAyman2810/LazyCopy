@@ -31,7 +31,8 @@ func main() {
 	copyWindow := myApp.NewWindow("Copy/Paste")
 	copyWindow.Resize(fyne.NewSize(300, 150))
 	copyWindow.SetFixedSize(true)
-	copyWindow.Hide()
+	copyWindow.Canvas().Focused()
+	//copyWindow.Hide()
 
 	var selectedText string
 
@@ -42,6 +43,7 @@ func main() {
 			if err := clipboard.WriteAll(selectedText); err != nil {
 				fmt.Printf("Error writing to clipboard: %v\n", err)
 			}
+			// Window stays open and on top
 		}
 	})
 
