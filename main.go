@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os/exec"
+	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -42,6 +44,16 @@ func (c *ClickCatcher) CreateRenderer() fyne.WidgetRenderer {
 	return widget.NewSimpleRenderer(container.NewPadded())
 }
 
+func getSelectedText() string {
+	cmd := exec.Command("xclip", "-o", "-selection", "primary")
+	output, err := cmd.Output()
+	if err != nil {
+		fmt.Printf("Error getting selection: %v\n", err)
+		return ""
+	}
+	return strings.TrimSpace(string(output))
+}
+
 func main() {
 	fmt.Println("Starting application...")
 	myApp := app.New()
@@ -53,10 +65,12 @@ func main() {
 	copyWindow.SetFixedSize(true)
 	copyWindow.Hide()
 
+	var selectedText string
 	copyBtn := widget.NewButton("Copy", func() {
-		fmt.Println("Copy button clicked!")
-		if err := clipboard.WriteAll("Hello from the app!"); err != nil {
-			fmt.Printf("Error writing to clipboard: %v\n", err)
+		if selectedText != "" {
+			if err := clipboard.WriteAll(selectedText); err != nil {
+				fmt.Printf("Error writing to clipboard: %v\n", err)
+			}
 		}
 		copyWindow.Hide()
 	})
@@ -68,6 +82,18 @@ func main() {
 
 	clickCatcher := NewClickCatcher(copyWindow)
 	mainWindow.SetContent(clickCatcher)
+
+	go func() {
+		for {
+			newSelection := getSelectedText()
+			if newSelection != "" && newSelection != selectedText {
+				selectedText = newSelection
+				copyWindow.Show()
+				copyWindow.CenterOnScreen()
+				copyWindow.RequestFocus()
+			}
+		}
+	}()
 
 	mainWindow.Show()
 	fmt.Println("Starting main application loop...")
