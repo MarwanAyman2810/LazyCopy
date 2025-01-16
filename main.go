@@ -33,7 +33,7 @@ func main() {
 	copyWindow.Resize(fyne.NewSize(300, 150))
 	copyWindow.SetFixedSize(true)
 	copyWindow.Canvas().Focused()
-	//copyWindow.Hide()
+	copyWindow.Hide()
 
 	var selectedText string
 
@@ -75,6 +75,7 @@ func main() {
 				copyWindow.CenterOnScreen()
 				copyWindow.RequestFocus()
 			}
+			time.Sleep(100 * time.Millisecond)
 		}
 	}()
 
